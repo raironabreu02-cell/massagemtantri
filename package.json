@@ -1,0 +1,18 @@
+{
+  "name": "painel-admin-sexo-oral",
+  "version": "1.0.0",
+  "description": "Painel admin para rastreamento de visitantes e conversões",
+  "type": "module",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'build'",
+    "start": "vercel dev"
+  },
+  "dependencies": {
+    "@upstash/redis": "^1.30.0"
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": "18.x"
+  }
+}
