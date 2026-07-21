@@ -4,11 +4,6 @@
   "buildCommand": "echo 'No build needed'",
   "devCommand": "python3 -m http.server 3000",
   "regions": ["sfo1"],
-  "functions": {
-    "api/**/*.js": {
-      "runtime": "nodejs18.x"
-    }
-  },
   "routes": [
     {
       "src": "/(.*)",
