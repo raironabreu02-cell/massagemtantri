@@ -1,0 +1,44 @@
+{
+  "version": 2,
+  "name": "curso-massagem-tantrica",
+  "buildCommand": "echo 'No build needed'",
+  "devCommand": "python3 -m http.server 3000",
+  "regions": ["sfo1"],
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/.*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=3600"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "SAMEORIGIN"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/policy",
+      "destination": "/privacy.html",
+      "permanent": true
+    }
+  ]
+}
