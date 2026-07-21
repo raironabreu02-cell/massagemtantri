@@ -1,26 +1,22 @@
 {
   "buildCommand": "npm install",
   "outputDirectory": ".",
-  "cleanUrls": true,
+  "public": ".",
+  "trailingSlash": false,
   "rewrites": [
     {
       "source": "/dashboard",
-      "destination": "/dashboard.html"
+      "destination": "dashboard.html"
     },
     {
-      "source": "/api/:path*",
-      "destination": "/api/:path*"
+      "source": "/dashboard.html",
+      "destination": "dashboard.html"
     }
   ],
-  "headers": [
-    {
-      "source": "/(.*)",
-      "headers": [
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600"
-        }
-      ]
+  "functions": {
+    "api/*.js": {
+      "memory": 128,
+      "maxDuration": 10
     }
-  ]
+  }
 }
