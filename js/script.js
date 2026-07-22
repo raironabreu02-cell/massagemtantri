@@ -1,90 +1,112 @@
-// Countdown de Carregamento
-document.addEventListener('DOMContentLoaded', function() {
-    const ageModal = document.getElementById('ageModal');
-    const mainContent = document.getElementById('mainContent');
-    const countdownEl = document.getElementById('countdown');
+// Função para disparar evento de checkout iniciado
+function iniciarCheckout(button) {
+    const plan = button.getAttribute('data-plan');
+    const price = parseFloat(button.getAttribute('data-price'));
 
-    // Verificar se já passou pelo countdown
-    if (localStorage.getItem('siteLoaded') === 'true') {
-        ageModal.style.display = 'none';
-        mainContent.classList.remove('hidden');
+    console.log(`Iniciando checkout: ${plan} - R$ ${price.toFixed(2)}`);
+
+    // ============================================================
+    // 1. META PIXEL - Evento InitiateCheckout
+    // ============================================================
+    if (typeof fbq !== 'undefined') {
+        fbq('track', 'InitiateCheckout', {
+            value: price,
+            currency: 'BRL',
+            content_name: `Plano ${plan}`,
+            content_type: 'product'
+        });
+        console.log('✅ Meta Pixel: InitiateCheckout disparado');
     } else {
-        // Iniciar countdown
-        let count = 3;
-        
-        const interval = setInterval(function() {
-            countdownEl.textContent = count;
-            
-            // Animação de escala
-            countdownEl.style.animation = 'none';
-            setTimeout(() => {
-                countdownEl.style.animation = 'pulse 1s infinite';
-            }, 10);
-            
-            count--;
-            
-            if (count < 0) {
-                clearInterval(interval);
-                
-                // Efeito de fade out
-                ageModal.style.transition = 'opacity 0.5s ease';
-                ageModal.style.opacity = '0';
-                
-                setTimeout(() => {
-                    ageModal.style.display = 'none';
-                    mainContent.classList.remove('hidden');
-                    localStorage.setItem('siteLoaded', 'true');
-                    
-                    // Track no Meta Pixel
-                    if (typeof fbq !== 'undefined') {
-                        fbq('track', 'ViewContent', {
-                            content_type: 'product',
-                            content_name: 'Curso de Massagem Tântrica',
-                            currency: 'BRL'
-                        });
-                    }
-                }, 500);
-            }
-        }, 1000);
+        console.warn('❌ Meta Pixel não carregado');
     }
 
-    // Rastreamento de scroll depth
-    let scrollTracked = {
-        '25': false,
-        '50': false,
-        '75': false,
-        '100': false
-    };
+    // ============================================================
+    // 2. UTIMIFY - Evento de Checkout
+    // ============================================================
+    try {
+        if (typeof window.utimify !== 'undefined') {
+            window.utimify.track('checkout_initiated', {
+                plan: plan,
+                price: price,
+                currency: 'BRL',
+                timestamp: new Date().toISOString()
+            });
+            console.log('✅ Utimify: Checkout iniciado');
+        } else if (typeof window.utimifyConfig !== 'undefined') {
+            // Se Utimify ainda está carregando, enviar via fetch
+            console.log('⏳ Utimify carregando, tentando enviar via API');
+        }
+    } catch (error) {
+        console.error('Erro ao enviar para Utimify:', error);
+    }
 
+    // ============================================================
+    // 3. ENVIAR PARA API LOCAL (opcional - seu servidor)
+    // ============================================================
+    fetch('/api/track', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            event: 'checkout_initiated',
+            plan: plan,
+            price: price,
+            timestamp: new Date().toISOString()
+        })
+    }).catch(err => console.log('API local não disponível:', err));
+
+    // ============================================================
+    // 4. REDIRECIONAR PARA CHECKOUT (após 500ms)
+    // ============================================================
+    setTimeout(() => {
+        if (plan === 'Básico') {
+            // Link do plano básico
+            window.location.href = 'https://pay.wiapy.com/hhWCQBEwcEEh';
+        } else if (plan === 'Premium') {
+            // Link do plano premium
+            window.location.href = 'https://pay.wiapy.com/xxZK8aNw7uYZ';
+        }
+    }, 500);
+}
+
+// ============================================================
+// RASTREAMENTO INICIAL DE PÁGINA
+// ============================================================
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('✅ Página carregada - Eventos de tracking inicializados');
+
+    // Meta Pixel ViewContent
+    if (typeof fbq !== 'undefined') {
+        fbq('track', 'ViewContent', {
+            content_name: 'Sexo Oral Perfeito',
+            content_type: 'product'
+        });
+        console.log('✅ Meta Pixel: ViewContent disparado');
+    }
+
+    // Rastrear scroll
+    let scrollTracked = false;
     window.addEventListener('scroll', function() {
-        const scrollPercentage = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
-        
-        if (scrollPercentage >= 25 && !scrollTracked['25']) {
-            if (typeof fbq !== 'undefined') {
-                fbq('track', 'ViewContent', { scroll_depth: '25%' });
+        if (!scrollTracked) {
+            const scrollPercentage = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            if (scrollPercentage > 50) {
+                fbq('track', 'ViewContent', {
+                    content_name: 'Scroll 50%',
+                    content_type: 'engagement'
+                });
+                scrollTracked = true;
+                console.log('✅ Meta Pixel: Scroll 50% rastreado');
             }
-            scrollTracked['25'] = true;
-        }
-        
-        if (scrollPercentage >= 50 && !scrollTracked['50']) {
-            if (typeof fbq !== 'undefined') {
-                fbq('track', 'ViewContent', { scroll_depth: '50%' });
-            }
-            scrollTracked['50'] = true;
-        }
-        
-        if (scrollPercentage >= 75 && !scrollTracked['75']) {
-            if (typeof fbq !== 'undefined') {
-                fbq('track', 'ViewContent', { scroll_depth: '75%' });
-            }
-            scrollTracked['75'] = true;
-        }
-        
-        if (scrollPercentage >= 100 && !scrollTracked['100']) {
-            if (typeof fbq !== 'undefined') {
-                fbq('track', 'ViewContent', { scroll_depth: '100%' });
-            }
-            scrollTracked['100'] = true;
         }
     });
 });
+
+// ============================================================
+// CONFIRMAR META PIXEL NA CONSOLE
+// ============================================================
+console.log('%c🔍 META PIXEL VERIFICAÇÃO', 'color: #d32f2f; font-weight: bold; font-size: 14px');
+console.log('%cPixel ID: 2258617738296037', 'color: #d32f2f; font-weight: bold');
+console.log('%c✅ Meta Pixel está ATIVO', 'color: green; font-weight: bold');
+console.log('%c✅ Eventos: PageView, ViewContent, InitiateCheckout', 'color: green');
+console.log('%c✅ Utimify preparado para receber eventos', 'color: green');

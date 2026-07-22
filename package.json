@@ -1,17 +1,14 @@
 {
-  "name": "painel-admin-sexo-oral",
+  "name": "sexo-oral-perfeito",
   "version": "1.0.0",
-  "description": "Painel admin para rastreamento de visitantes e conversões",
-  "type": "module",
+  "description": "Curso online - Sexo Oral Perfeito",
+  "private": true,
   "scripts": {
     "dev": "vercel dev",
     "build": "echo 'build'",
     "start": "vercel dev"
   },
-  "dependencies": {
-    "@upstash/redis": "^1.30.0"
-  },
-  "devDependencies": {},
+  "dependencies": {},
   "engines": {
     "node": "18.x"
   }
