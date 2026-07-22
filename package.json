@@ -1,15 +1,6 @@
 {
   "name": "sexo-oral-perfeito",
   "version": "1.0.0",
-  "description": "Curso online - Sexo Oral Perfeito",
-  "private": true,
-  "scripts": {
-    "dev": "vercel dev",
-    "build": "echo 'build'",
-    "start": "vercel dev"
-  },
-  "dependencies": {},
-  "engines": {
-    "node": "18.x"
-  }
+  "description": "Curso online",
+  "private": true
 }
